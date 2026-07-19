@@ -83,14 +83,3 @@ if __name__ == "__main__":
     )
     print(df.sort_values("TIME_PERIOD"))
     print(f"\nRows retrieved: {len(df)}")
-
-"""    
-print(df[df['Index'].str.contains('all groups', case=False, na=False)][['INDEX', 'Index']].drop_duplicates())
-print(df[df['Region'].str.contains('australia', case=False, na=False)][['REGION', 'Region']].drop_duplicates())
-print(df[['TSEST', 'Adjustment Type']].drop_duplicates())
-print(df[['FREQ', 'Frequency']].drop_duplicates())
-
-df_cpi = fetch_data(dataflow_id="CPI", data_key="3.10001.10.50.M", start_period="2025", version="2.0.0")
-print(df_cpi[['TIME_PERIOD', 'OBS_VALUE']])
-print(f"Rows: {len(df_cpi)}")
-"""

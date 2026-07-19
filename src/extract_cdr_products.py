@@ -15,6 +15,7 @@ IMPORTANT:
 - Responses are paginated via a `links.next` field — this script follows
   pagination automatically.
 """
+
 import time
 import requests
 import pandas as pd
