@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: fct_cpi_trend
+    description: >
+      Australian headline CPI (year-on-year % change), ordered by month,
+      with a month-over-month shift column for trend analysis.
+    columns:
+      - name: time_period
+        tests:
+          - not_null
+          - unique
+      - name: cpi_pct_change_yoy
+        tests:
+          - not_null
+
+  - name: fct_bank_products_latest
+    description: >
+      One row per bank product, deduplicated to each product's most
+      recent pipeline snapshot. This is the table the dashboard should
+      query for "current" bank product comparisons. Uniqueness on
+      (product_id, bank) is guaranteed by construction via the
+      row_number() dedup in the model itself, not tested separately here.
+    columns:
+      - name: product_id
+        tests:
+          - not_null
+      - name: bank
+        tests:
+          - not_null
+      - name: product_name
+        tests:
+          - not_null
