@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: stg_abs_cpi
+    description: Cleaned ABS CPI staging model — one row per monthly reading per pipeline run.
+    columns:
+      - name: time_period
+        description: Month the reading applies to (YYYY-MM).
+        tests:
+          - not_null
+      - name: cpi_pct_change_yoy
+        description: Year-on-year percentage change in headline CPI.
+        tests:
+          - not_null
+      - name: loaded_at
+        tests:
+          - not_null
+
+  - name: stg_cdr_products
+    description: Cleaned CDR banking product staging model — one row per product per pipeline run.
+    columns:
+      - name: product_id
+        description: Bank-assigned product identifier.
+        tests:
+          - not_null
+      - name: bank
+        description: Which bank this product belongs to.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['ANZ', 'Westpac', 'CBA', 'Suncorp']
+      - name: product_name
+        tests:
+          - not_null

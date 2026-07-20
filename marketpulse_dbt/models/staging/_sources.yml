@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: >
+      Raw, unprocessed data as landed by the Python extraction scripts
+      (extract_abs.py, extract_cdr_products.py via load_raw.py). Every
+      write appends a loaded_at timestamp rather than overwriting, so
+      these tables accumulate a history of snapshots over time.
+    tables:
+      - name: abs_cpi
+        description: Raw ABS CPI monthly percentage-change readings, filtered to headline "All groups CPI" for Australia.
+        columns:
+          - name: TIME_PERIOD
+            description: The month the CPI reading applies to (YYYY-MM).
+          - name: OBS_VALUE
+            description: The percentage change value.
+          - name: loaded_at
+            description: UTC timestamp when this row was written by the pipeline.
+
+      - name: cdr_products
+        description: Raw banking product data from Australian banks' public CDR Product Reference APIs.
+        columns:
+          - name: productId
+            description: Bank-assigned unique product identifier.
+          - name: _bank
+            description: Which bank this product came from (added by our extraction script, not part of the original API response).
+          - name: loaded_at
+            description: UTC timestamp when this row was written by the pipeline.
