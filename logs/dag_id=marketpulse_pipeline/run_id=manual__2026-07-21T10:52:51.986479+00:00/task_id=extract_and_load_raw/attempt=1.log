@@ -1,0 +1,35 @@
+[2026-07-21T10:52:52.504+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-07-21T10:52:52.562+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: marketpulse_pipeline.extract_and_load_raw manual__2026-07-21T10:52:51.986479+00:00 [queued]>
+[2026-07-21T10:52:52.573+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: marketpulse_pipeline.extract_and_load_raw manual__2026-07-21T10:52:51.986479+00:00 [queued]>
+[2026-07-21T10:52:52.573+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 2
+[2026-07-21T10:52:52.587+0000] {taskinstance.py:2330} INFO - Executing <Task(BashOperator): extract_and_load_raw> on 2026-07-21 10:52:51.986479+00:00
+[2026-07-21T10:52:52.596+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'marketpulse_pipeline', 'extract_and_load_raw', 'manual__2026-07-21T10:52:51.986479+00:00', '--job-id', '7', '--raw', '--subdir', 'DAGS_FOLDER/marketpulse_pipeline.py', '--cfg-path', '/tmp/tmp76n7dz1m']
+[2026-07-21T10:52:52.598+0000] {standard_task_runner.py:91} INFO - Job 7: Subtask extract_and_load_raw
+[2026-07-21T10:52:52.600+0000] {logging_mixin.py:188} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:62 DeprecationWarning: This process (pid=332) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2026-07-21T10:52:52.602+0000] {standard_task_runner.py:64} INFO - Started process 333 to run task
+[2026-07-21T10:52:52.638+0000] {task_command.py:426} INFO - Running <TaskInstance: marketpulse_pipeline.extract_and_load_raw manual__2026-07-21T10:52:51.986479+00:00 [running]> on host 43b415d14da3
+[2026-07-21T10:52:52.766+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='maxson' AIRFLOW_CTX_DAG_ID='marketpulse_pipeline' AIRFLOW_CTX_TASK_ID='extract_and_load_raw' AIRFLOW_CTX_EXECUTION_DATE='2026-07-21T10:52:51.986479+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-07-21T10:52:51.986479+00:00'
+[2026-07-21T10:52:52.769+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-07-21T10:52:52.795+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2026-07-21T10:52:52.795+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'cd /opt/***/src && python load_raw.py']
+[2026-07-21T10:52:52.808+0000] {subprocess.py:86} INFO - Output:
+[2026-07-21T10:52:57.555+0000] {subprocess.py:93} INFO - /opt/***/src/load_raw.py:30: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+[2026-07-21T10:52:57.556+0000] {subprocess.py:93} INFO -   df["loaded_at"] = datetime.datetime.utcnow()
+[2026-07-21T10:53:08.446+0000] {subprocess.py:93} INFO - /opt/***/src/load_raw.py:49: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+[2026-07-21T10:53:08.447+0000] {subprocess.py:93} INFO -   df["loaded_at"] = datetime.datetime.utcnow()
+[2026-07-21T10:53:08.535+0000] {subprocess.py:93} INFO - Fetching ABS CPI...
+[2026-07-21T10:53:08.535+0000] {subprocess.py:93} INFO - Wrote 14 rows to raw.abs_cpi
+[2026-07-21T10:53:08.535+0000] {subprocess.py:93} INFO - Fetching CDR bank products...
+[2026-07-21T10:53:08.536+0000] {subprocess.py:93} INFO - Fetching ANZ...
+[2026-07-21T10:53:08.536+0000] {subprocess.py:93} INFO - Fetching Westpac...
+[2026-07-21T10:53:08.536+0000] {subprocess.py:93} INFO - Fetching CBA...
+[2026-07-21T10:53:08.536+0000] {subprocess.py:93} INFO - Fetching Suncorp...
+[2026-07-21T10:53:08.537+0000] {subprocess.py:93} INFO - Wrote 204 rows to raw.cdr_products
+[2026-07-21T10:53:08.537+0000] {subprocess.py:93} INFO - 
+[2026-07-21T10:53:08.537+0000] {subprocess.py:93} INFO - Done. Check the 'raw' schema in your Supabase Table Editor.
+[2026-07-21T10:53:08.629+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2026-07-21T10:53:08.630+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-07-21T10:53:08.652+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=marketpulse_pipeline, task_id=extract_and_load_raw, run_id=manual__2026-07-21T10:52:51.986479+00:00, execution_date=20260721T105251, start_date=20260721T105252, end_date=20260721T105308
+[2026-07-21T10:53:08.703+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-07-21T10:53:08.724+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2026-07-21T10:53:08.726+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

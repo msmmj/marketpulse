@@ -1,0 +1,41 @@
+[2026-07-21T11:20:59.136+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-07-21T11:20:59.173+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: marketpulse_pipeline.dbt_run manual__2026-07-21T11:15:30.352750+00:00 [queued]>
+[2026-07-21T11:20:59.182+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: marketpulse_pipeline.dbt_run manual__2026-07-21T11:15:30.352750+00:00 [queued]>
+[2026-07-21T11:20:59.182+0000] {taskinstance.py:2306} INFO - Starting attempt 2 of 2
+[2026-07-21T11:20:59.198+0000] {taskinstance.py:2330} INFO - Executing <Task(BashOperator): dbt_run> on 2026-07-21 11:15:30.352750+00:00
+[2026-07-21T11:20:59.207+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'marketpulse_pipeline', 'dbt_run', 'manual__2026-07-21T11:15:30.352750+00:00', '--job-id', '14', '--raw', '--subdir', 'DAGS_FOLDER/marketpulse_pipeline.py', '--cfg-path', '/tmp/tmpjiki5cf3']
+[2026-07-21T11:20:59.210+0000] {standard_task_runner.py:91} INFO - Job 14: Subtask dbt_run
+[2026-07-21T11:20:59.211+0000] {logging_mixin.py:188} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:62 DeprecationWarning: This process (pid=248) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2026-07-21T11:20:59.213+0000] {standard_task_runner.py:64} INFO - Started process 249 to run task
+[2026-07-21T11:20:59.248+0000] {task_command.py:426} INFO - Running <TaskInstance: marketpulse_pipeline.dbt_run manual__2026-07-21T11:15:30.352750+00:00 [running]> on host 67cb4b723c67
+[2026-07-21T11:20:59.326+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='maxson' AIRFLOW_CTX_DAG_ID='marketpulse_pipeline' AIRFLOW_CTX_TASK_ID='dbt_run' AIRFLOW_CTX_EXECUTION_DATE='2026-07-21T11:15:30.352750+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-07-21T11:15:30.352750+00:00'
+[2026-07-21T11:20:59.326+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-07-21T11:20:59.341+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2026-07-21T11:20:59.341+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'cd /opt/***/marketpulse_dbt && /home/***/dbt_venv/bin/dbt run']
+[2026-07-21T11:20:59.352+0000] {subprocess.py:86} INFO - Output:
+[2026-07-21T11:21:03.893+0000] {subprocess.py:93} INFO - [0m11:21:03  Running with dbt=1.12.0
+[2026-07-21T11:21:04.494+0000] {subprocess.py:93} INFO - [0m11:21:04  Registered adapter: postgres=1.11.0
+[2026-07-21T11:21:06.067+0000] {subprocess.py:93} INFO - [0m11:21:06  Found 4 models, 13 data tests, 2 sources, 477 macros
+[2026-07-21T11:21:06.072+0000] {subprocess.py:93} INFO - [0m11:21:06
+[2026-07-21T11:21:06.073+0000] {subprocess.py:93} INFO - [0m11:21:06  Concurrency: 4 threads (target='dev')
+[2026-07-21T11:21:06.074+0000] {subprocess.py:93} INFO - [0m11:21:06
+[2026-07-21T11:21:06.604+0000] {subprocess.py:93} INFO - [0m11:21:06  1 of 4 START sql view model dbt_dev.stg_abs_cpi ................................ [RUN]
+[2026-07-21T11:21:06.605+0000] {subprocess.py:93} INFO - [0m11:21:06  2 of 4 START sql view model dbt_dev.stg_cdr_products ........................... [RUN]
+[2026-07-21T11:21:07.142+0000] {subprocess.py:93} INFO - [0m11:21:07  2 of 4 OK created sql view model dbt_dev.stg_cdr_products ...................... [[32mCREATE VIEW[0m in 0.53s]
+[2026-07-21T11:21:07.144+0000] {subprocess.py:93} INFO - [0m11:21:07  1 of 4 OK created sql view model dbt_dev.stg_abs_cpi ........................... [[32mCREATE VIEW[0m in 0.54s]
+[2026-07-21T11:21:07.148+0000] {subprocess.py:93} INFO - [0m11:21:07  3 of 4 START sql table model dbt_dev.fct_bank_products_latest .................. [RUN]
+[2026-07-21T11:21:07.150+0000] {subprocess.py:93} INFO - [0m11:21:07  4 of 4 START sql table model dbt_dev.fct_cpi_trend ............................. [RUN]
+[2026-07-21T11:21:07.580+0000] {subprocess.py:93} INFO - [0m11:21:07  4 of 4 OK created sql table model dbt_dev.fct_cpi_trend ........................ [[32mSELECT 14[0m in 0.43s]
+[2026-07-21T11:21:07.583+0000] {subprocess.py:93} INFO - [0m11:21:07  3 of 4 OK created sql table model dbt_dev.fct_bank_products_latest ............. [[32mSELECT 204[0m in 0.43s]
+[2026-07-21T11:21:07.666+0000] {subprocess.py:93} INFO - [0m11:21:07
+[2026-07-21T11:21:07.668+0000] {subprocess.py:93} INFO - [0m11:21:07  Finished running 2 table models, 2 view models in 0 hours 0 minutes and 1.59 seconds (1.59s).
+[2026-07-21T11:21:07.925+0000] {subprocess.py:93} INFO - [0m11:21:07
+[2026-07-21T11:21:07.927+0000] {subprocess.py:93} INFO - [0m11:21:07  [32mCompleted successfully[0m
+[2026-07-21T11:21:07.930+0000] {subprocess.py:93} INFO - [0m11:21:07
+[2026-07-21T11:21:07.932+0000] {subprocess.py:93} INFO - [0m11:21:07  Done. PASS=4 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=4
+[2026-07-21T11:21:09.543+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2026-07-21T11:21:09.544+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-07-21T11:21:09.572+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=marketpulse_pipeline, task_id=dbt_run, run_id=manual__2026-07-21T11:15:30.352750+00:00, execution_date=20260721T111530, start_date=20260721T112059, end_date=20260721T112109
+[2026-07-21T11:21:09.623+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-07-21T11:21:09.639+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2026-07-21T11:21:09.640+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

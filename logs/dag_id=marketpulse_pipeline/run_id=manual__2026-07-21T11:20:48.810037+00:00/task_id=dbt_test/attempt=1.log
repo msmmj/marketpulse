@@ -1,0 +1,59 @@
+[2026-07-21T11:21:11.522+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-07-21T11:21:11.603+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: marketpulse_pipeline.dbt_test manual__2026-07-21T11:20:48.810037+00:00 [queued]>
+[2026-07-21T11:21:11.616+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: marketpulse_pipeline.dbt_test manual__2026-07-21T11:20:48.810037+00:00 [queued]>
+[2026-07-21T11:21:11.617+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 2
+[2026-07-21T11:21:11.633+0000] {taskinstance.py:2330} INFO - Executing <Task(BashOperator): dbt_test> on 2026-07-21 11:20:48.810037+00:00
+[2026-07-21T11:21:11.663+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'marketpulse_pipeline', 'dbt_test', 'manual__2026-07-21T11:20:48.810037+00:00', '--job-id', '17', '--raw', '--subdir', 'DAGS_FOLDER/marketpulse_pipeline.py', '--cfg-path', '/tmp/tmp44qkcr8c']
+[2026-07-21T11:21:11.670+0000] {standard_task_runner.py:91} INFO - Job 17: Subtask dbt_test
+[2026-07-21T11:21:11.675+0000] {logging_mixin.py:188} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:62 DeprecationWarning: This process (pid=279) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2026-07-21T11:21:11.677+0000] {standard_task_runner.py:64} INFO - Started process 280 to run task
+[2026-07-21T11:21:11.769+0000] {task_command.py:426} INFO - Running <TaskInstance: marketpulse_pipeline.dbt_test manual__2026-07-21T11:20:48.810037+00:00 [running]> on host 67cb4b723c67
+[2026-07-21T11:21:11.930+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='maxson' AIRFLOW_CTX_DAG_ID='marketpulse_pipeline' AIRFLOW_CTX_TASK_ID='dbt_test' AIRFLOW_CTX_EXECUTION_DATE='2026-07-21T11:20:48.810037+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-07-21T11:20:48.810037+00:00'
+[2026-07-21T11:21:11.933+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-07-21T11:21:12.014+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2026-07-21T11:21:12.014+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'cd /opt/***/marketpulse_dbt && /home/***/dbt_venv/bin/dbt test']
+[2026-07-21T11:21:12.040+0000] {subprocess.py:86} INFO - Output:
+[2026-07-21T11:21:16.513+0000] {subprocess.py:93} INFO - [0m11:21:16  Running with dbt=1.12.0
+[2026-07-21T11:21:17.065+0000] {subprocess.py:93} INFO - [0m11:21:17  Registered adapter: postgres=1.11.0
+[2026-07-21T11:21:18.356+0000] {subprocess.py:93} INFO - [0m11:21:18  Found 4 models, 13 data tests, 2 sources, 477 macros
+[2026-07-21T11:21:18.362+0000] {subprocess.py:93} INFO - [0m11:21:18
+[2026-07-21T11:21:18.363+0000] {subprocess.py:93} INFO - [0m11:21:18  Concurrency: 4 threads (target='dev')
+[2026-07-21T11:21:18.364+0000] {subprocess.py:93} INFO - [0m11:21:18
+[2026-07-21T11:21:18.601+0000] {subprocess.py:93} INFO - [0m11:21:18  1 of 13 START test accepted_values_stg_cdr_products_bank__ANZ__Westpac__CBA__Suncorp  [RUN]
+[2026-07-21T11:21:18.601+0000] {subprocess.py:93} INFO - [0m11:21:18  2 of 13 START test not_null_fct_bank_products_latest_bank ...................... [RUN]
+[2026-07-21T11:21:18.603+0000] {subprocess.py:93} INFO - [0m11:21:18  4 of 13 START test not_null_fct_bank_products_latest_product_name .............. [RUN]
+[2026-07-21T11:21:18.626+0000] {subprocess.py:93} INFO - [0m11:21:18  3 of 13 START test not_null_fct_bank_products_latest_product_id ................ [RUN]
+[2026-07-21T11:21:18.815+0000] {subprocess.py:93} INFO - [0m11:21:18  3 of 13 PASS not_null_fct_bank_products_latest_product_id ...................... [[32mPASS[0m in 0.19s]
+[2026-07-21T11:21:18.817+0000] {subprocess.py:93} INFO - [0m11:21:18  5 of 13 START test not_null_fct_cpi_trend_cpi_pct_change_yoy ................... [RUN]
+[2026-07-21T11:21:18.828+0000] {subprocess.py:93} INFO - [0m11:21:18  2 of 13 PASS not_null_fct_bank_products_latest_bank ............................ [[32mPASS[0m in 0.23s]
+[2026-07-21T11:21:18.829+0000] {subprocess.py:93} INFO - [0m11:21:18  4 of 13 PASS not_null_fct_bank_products_latest_product_name .................... [[32mPASS[0m in 0.21s]
+[2026-07-21T11:21:18.830+0000] {subprocess.py:93} INFO - [0m11:21:18  1 of 13 PASS accepted_values_stg_cdr_products_bank__ANZ__Westpac__CBA__Suncorp . [[32mPASS[0m in 0.23s]
+[2026-07-21T11:21:18.836+0000] {subprocess.py:93} INFO - [0m11:21:18  6 of 13 START test not_null_fct_cpi_trend_time_period .......................... [RUN]
+[2026-07-21T11:21:18.837+0000] {subprocess.py:93} INFO - [0m11:21:18  7 of 13 START test not_null_stg_abs_cpi_cpi_pct_change_yoy ..................... [RUN]
+[2026-07-21T11:21:18.838+0000] {subprocess.py:93} INFO - [0m11:21:18  8 of 13 START test not_null_stg_abs_cpi_loaded_at .............................. [RUN]
+[2026-07-21T11:21:19.009+0000] {subprocess.py:93} INFO - [0m11:21:19  5 of 13 PASS not_null_fct_cpi_trend_cpi_pct_change_yoy ......................... [[32mPASS[0m in 0.19s]
+[2026-07-21T11:21:19.011+0000] {subprocess.py:93} INFO - [0m11:21:19  9 of 13 START test not_null_stg_abs_cpi_time_period ............................ [RUN]
+[2026-07-21T11:21:19.038+0000] {subprocess.py:93} INFO - [0m11:21:19  6 of 13 PASS not_null_fct_cpi_trend_time_period ................................ [[32mPASS[0m in 0.20s]
+[2026-07-21T11:21:19.039+0000] {subprocess.py:93} INFO - [0m11:21:19  8 of 13 PASS not_null_stg_abs_cpi_loaded_at .................................... [[32mPASS[0m in 0.20s]
+[2026-07-21T11:21:19.041+0000] {subprocess.py:93} INFO - [0m11:21:19  7 of 13 PASS not_null_stg_abs_cpi_cpi_pct_change_yoy ........................... [[32mPASS[0m in 0.20s]
+[2026-07-21T11:21:19.045+0000] {subprocess.py:93} INFO - [0m11:21:19  12 of 13 START test not_null_stg_cdr_products_product_name ..................... [RUN]
+[2026-07-21T11:21:19.046+0000] {subprocess.py:93} INFO - [0m11:21:19  10 of 13 START test not_null_stg_cdr_products_bank ............................. [RUN]
+[2026-07-21T11:21:19.048+0000] {subprocess.py:93} INFO - [0m11:21:19  11 of 13 START test not_null_stg_cdr_products_product_id ....................... [RUN]
+[2026-07-21T11:21:19.110+0000] {subprocess.py:93} INFO - [0m11:21:19  9 of 13 PASS not_null_stg_abs_cpi_time_period .................................. [[32mPASS[0m in 0.10s]
+[2026-07-21T11:21:19.117+0000] {subprocess.py:93} INFO - [0m11:21:19  13 of 13 START test unique_fct_cpi_trend_time_period ........................... [RUN]
+[2026-07-21T11:21:19.186+0000] {subprocess.py:93} INFO - [0m11:21:19  12 of 13 PASS not_null_stg_cdr_products_product_name ........................... [[32mPASS[0m in 0.14s]
+[2026-07-21T11:21:19.196+0000] {subprocess.py:93} INFO - [0m11:21:19  11 of 13 PASS not_null_stg_cdr_products_product_id ............................. [[32mPASS[0m in 0.14s]
+[2026-07-21T11:21:19.206+0000] {subprocess.py:93} INFO - [0m11:21:19  10 of 13 PASS not_null_stg_cdr_products_bank ................................... [[32mPASS[0m in 0.16s]
+[2026-07-21T11:21:19.237+0000] {subprocess.py:93} INFO - [0m11:21:19  13 of 13 PASS unique_fct_cpi_trend_time_period ................................. [[32mPASS[0m in 0.12s]
+[2026-07-21T11:21:19.310+0000] {subprocess.py:93} INFO - [0m11:21:19
+[2026-07-21T11:21:19.312+0000] {subprocess.py:93} INFO - [0m11:21:19  Finished running 13 data tests in 0 hours 0 minutes and 0.95 seconds (0.95s).
+[2026-07-21T11:21:19.414+0000] {subprocess.py:93} INFO - [0m11:21:19
+[2026-07-21T11:21:19.415+0000] {subprocess.py:93} INFO - [0m11:21:19  [32mCompleted successfully[0m
+[2026-07-21T11:21:19.416+0000] {subprocess.py:93} INFO - [0m11:21:19
+[2026-07-21T11:21:19.417+0000] {subprocess.py:93} INFO - [0m11:21:19  Done. PASS=13 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=13
+[2026-07-21T11:21:20.762+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2026-07-21T11:21:20.764+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-07-21T11:21:20.800+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=marketpulse_pipeline, task_id=dbt_test, run_id=manual__2026-07-21T11:20:48.810037+00:00, execution_date=20260721T112048, start_date=20260721T112111, end_date=20260721T112120
+[2026-07-21T11:21:20.833+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-07-21T11:21:20.850+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-07-21T11:21:20.853+0000] {local_task_job_runner.py:222} INFO - ::endgroup::
