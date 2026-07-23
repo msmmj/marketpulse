@@ -25,3 +25,25 @@ df_cpi = fetch_data(dataflow_id="CPI", data_key="3.10001.10.50.M", start_period=
 print(df_cpi[['TIME_PERIOD', 'OBS_VALUE']])
 print(f"Rows: {len(df_cpi)}")
 """
+## Airflow orchestration (week 3)
+Built a Dockerized Airflow setup (LocalExecutor) running the full pipeline
+as a DAG: extract_and_load_raw -> dbt_run -> dbt_test, scheduled daily.
+
+Real issues hit and fixed, in order:
+- dbt-core and Airflow have conflicting dependency trees (different
+  required SQLAlchemy versions) - installing both in the same Python
+  env broke Airflow's ORM models. Fixed by isolating dbt in its own
+  virtualenv inside the image.
+- SQLAlchemy version difference between local (2.0.x) and Airflow's
+  bundled version (older) meant Connection.commit() wasn't available
+  the same way - fixed by using engine.begin() instead, which works
+  consistently across versions.
+- dbt-postgres doesn't version in lockstep with dbt-core past 1.8 -
+  adapters split into independent versioning. Left dbt-postgres
+  unpinned so pip resolves a compatible version automatically.
+- Airflow's webserver generated login redirects using "localhost"
+  instead of the actual Codespaces URL - fixed with
+  AIRFLOW__WEBSERVER__ENABLE_PROXY_FIX.
+- A stray trailing hyphen in docker-compose.yaml
+  (LocalExecutor- instead of LocalExecutor) silently broke the
+  webserver's executor import.

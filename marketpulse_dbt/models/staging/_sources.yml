@@ -28,3 +28,12 @@ sources:
             description: Which bank this product came from (added by our extraction script, not part of the original API response).
           - name: loaded_at
             description: UTC timestamp when this row was written by the pipeline.
+      - name: cdr_product_rates
+        description: Raw lending/deposit rate data pulled from each bank's CDR product detail endpoint.
+        columns:
+          - name: product_id
+            description: Links to cdr_products.productId for the parent product.
+          - name: rate
+            description: Representative interest rate as a decimal (e.g. 0.0679 = 6.79%).
+          - name: loaded_at
+            description: UTC timestamp when this row was written by the pipeline.
