@@ -33,7 +33,14 @@ def ensure_schema(engine, schema_name: str = "raw") -> None:
     default Postgres project only has 'public' by default — this creates
     a dedicated 'raw' schema so raw ingested data is clearly separated
     from anything dbt builds later (staging/marts will live elsewhere).
+
+    Uses engine.begin() rather than engine.connect() + manual commit() —
+    begin() auto-commits at the end of the `with` block and works
+    consistently across SQLAlchemy 1.4 and 2.0, whereas a plain
+    connect()'d Connection's .commit() behaves differently between
+    those versions (this surfaced as a real bug when running inside
+    Airflow's container, which bundles an older SQLAlchemy than our
+    local requirements.txt pinned).
     """
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema_name}"))
-        conn.commit()
