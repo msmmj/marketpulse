@@ -19,8 +19,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-st.set_page_config(page_title="MarketPulse", page_icon="📊", layout="wide")
-
+st.set_page_config(page_title="The Basis Point", page_icon="📊", layout="wide")
+st.title("📊 The Basis Point")
 # Consistent colour per bank across every chart in the app — assigned
 # once, here, so a bank's colour never changes between tabs or reruns.
 BANK_COLORS = {
