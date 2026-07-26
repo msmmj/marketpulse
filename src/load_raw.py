@@ -28,7 +28,7 @@ def load_abs_cpi(engine) -> None:
         start_period="2025",
         version="2.0.0",
     )
-    df["loaded_at"] = datetime.datetime.now(datetime.UTC)
+    df["loaded_at"] = datetime.datetime.now(datetime.timezone.utc)
 
     df.to_sql(
         "abs_cpi",
@@ -53,7 +53,7 @@ def load_cdr_products(engine):
 
     products_for_rates = df.copy()
 
-    df["loaded_at"] = datetime.datetime.now(datetime.UTC)
+    df["loaded_at"] = datetime.datetime.now(datetime.timezone.utc)
 
     # additionalInformation and cardArt are nested dict/list columns — Postgres
     # via to_sql can't store these directly, so stringify them.
@@ -92,7 +92,7 @@ def load_cdr_product_rates(engine, products_df) -> None:
         print("[WARN] No rate data retrieved — skipping write.")
         return
 
-    df["loaded_at"] = datetime.datetime.now(datetime.UTC)
+    df["loaded_at"] = datetime.datetime.now(datetime.timezone.utc)
 
     df.to_sql(
         "cdr_product_rates",
