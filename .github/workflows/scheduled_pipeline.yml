@@ -1,0 +1,72 @@
+name: Scheduled Pipeline
+
+# Runs the full pipeline automatically, every day, with no manual trigger
+# required. This is the ACTUAL production automation for this project —
+# the Airflow/Docker setup (see dags/marketpulse_pipeline.py) demonstrates
+# orchestration skill but runs in GitHub Codespaces, which isn't meant to
+# stay running 24/7. A scheduled GitHub Actions workflow is a genuine,
+# commonly-used lightweight orchestration pattern for pipelines at this
+# scale, and it's free and always-on by design.
+#
+# NOTE: GitHub automatically disables scheduled workflows on a repo after
+# 60 days with no commits at all. Any regular commit (even unrelated)
+# resets that clock, so an actively-maintained repo never hits this.
+
+on:
+  schedule:
+    - cron: "0 20 * * *" # 20:00 UTC daily = 6:00 AM AEST / 7:00 AM AEDT
+  workflow_dispatch: {} # also allows manual triggering from the Actions tab if ever needed
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Install dbt
+        run: |
+          pip install "dbt-core==1.12.*" dbt-postgres
+
+      - name: Run extraction and load to Supabase
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd src
+          python load_raw.py
+
+      - name: Create dbt profiles.yml from secrets
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << EOF
+          marketpulse_dbt:
+            target: dev
+            outputs:
+              dev:
+                type: postgres
+                host: ${{ secrets.SUPABASE_HOST }}
+                port: 5432
+                user: ${{ secrets.SUPABASE_USER }}
+                pass: ${{ secrets.SUPABASE_PASSWORD }}
+                dbname: postgres
+                schema: dbt_dev
+                threads: 4
+          EOF
+
+      - name: Run dbt models
+        run: |
+          cd marketpulse_dbt
+          dbt run
+
+      - name: Run dbt tests
+        run: |
+          cd marketpulse_dbt
+          dbt test
