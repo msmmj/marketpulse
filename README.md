@@ -1,13 +1,29 @@
 # The Basis Point
 
-**A live dashboard tracking how Australian banks actually price against
-inflation — extraction, orchestration, transformation, testing, and
-visualization, built entirely on free infrastructure.**
+**A live, automatically-updating dashboard tracking how Australian banks price
+against inflation — extraction, orchestration, transformation, testing, and
+visualization, running end-to-end with zero manual triggers, built entirely
+on free infrastructure.**
 
 *(Internal codebase name: `marketpulse` — folder structure and internal
 references below still use this name; it's just not the public-facing title.)*
 
 ![CI](https://github.com/msmmj/marketpulse/actions/workflows/ci.yml/badge.svg)
+![Scheduled Pipeline](https://github.com/msmmj/marketpulse/actions/workflows/scheduled_pipeline.yml/badge.svg)
+
+---
+
+## Live dashboard
+
+**🔗 [https://marketpulse-lqstbzqnvpb767grnr6c3x.streamlit.app/](https://marketpulse-lqstbzqnvpb767grnr6c3x.streamlit.app/)**
+
+This is a genuinely live, publicly deployed dashboard — not a local
+screenshot. It reads directly from Supabase, which refreshes automatically
+every day with no manual trigger (see "Automation & CD" below).
+
+![Overview tab](docs/screenshots/overview.png)
+![Key Insights tab](docs/screenshots/key_insights.png)
+![Rate Comparison tab](docs/screenshots/rate_comparison.png)
 
 ---
 
@@ -19,20 +35,7 @@ references below still use this name; it's just not the public-facing title.)*
 
 This is the same question comparison sites like Canstar and Finder answer
 commercially, and the same question a bank's own pricing/strategy team asks
-when benchmarking against competitors. This project answers it end-to-end,
-from raw government and banking APIs through to an interactive dashboard,
-without touching a single paid tool.
-
----
-
-## Live dashboard
-
-*(Screenshot placeholders below — replace with your own exported images from
-the running Streamlit app before publishing. Suggested path: `docs/screenshots/`.)*
-
-![Overview tab](docs/screenshots/overview.png)
-![Key Insights tab](docs/screenshots/key_insights.png)
-![Rate Comparison tab](docs/screenshots/rate_comparison.png)
+when benchmarking against competitors.
 
 ---
 
@@ -54,176 +57,157 @@ the running Streamlit app before publishing. Suggested path: `docs/screenshots/`
                           handling
                                           │
                                           ▼
-                        Raw storage (Postgres / Supabase)
+                    BRONZE — Raw storage (Postgres / Supabase)
                         · Append-only, timestamped snapshots
+                        · Untouched, exactly as received
                                           │
                                           ▼
-                             dbt (staging → marts)
-                        · Cleaning, type-casting
+                    SILVER — dbt staging models
+                        · Cleaning, renaming, type-casting
+                        · Still one row per raw record
+                                          │
+                                          ▼
+                    GOLD — dbt mart models
                         · Deduplication to latest snapshot
-                        · 16 automated data tests
+                        · Business joins, ready to query
                                           │
                                           ▼
-                          Streamlit dashboard
+                          Streamlit dashboard (LIVE)
                         · Overview, Key Insights,
                           Rate Comparison, Product
                           Browser, CPI Trend
 
-        Orchestration: Apache Airflow (Dockerized, run via GitHub Codespaces)
-        CI/CD: GitHub Actions — lint, format-check, and unit tests on every push
+  Automation: GitHub Actions scheduled workflow — runs extraction + dbt
+  daily, with NO manual trigger, free and unlimited on a public repo.
+
+  Orchestration (demonstrated separately): a Dockerized Apache Airflow DAG,
+  built and validated, showing the same pipeline logic in a different
+  orchestration paradigm — not the live production scheduler (see
+  "Automation & CD" below for why).
+
+  CD: Streamlit Community Cloud auto-redeploys the dashboard on every push.
+
+  CI: GitHub Actions — lint, format-check, and unit tests on every push.
 ```
+
+---
+
+## This project implements a medallion architecture
+
+Medallion architecture organizes data into three progressively cleaner
+layers. This project implements exactly that pattern, even though it wasn't
+originally built under that label:
+
+| Medallion layer | What it means | This project's actual component |
+|---|---|---|
+| **Bronze** | Raw, untouched, exactly as received | `raw.abs_cpi`, `raw.cdr_products`, `raw.cdr_product_rates` in Supabase — written directly from the Python extraction scripts, append-only |
+| **Silver** | Cleaned, typed, standardized, still detailed | dbt **staging models** (`stg_abs_cpi`, `stg_cdr_products`, `stg_cdr_product_rates`) — renamed columns, cast types, dropped redundant fields |
+| **Gold** | Business-ready, aggregated, dashboard-facing | dbt **mart models** (`fct_cpi_trend`, `fct_bank_products_latest`, `fct_bank_rates_latest`) — deduplicated to the latest snapshot per key, joined together, queried directly by the dashboard |
+
+---
+
+## Automation & CD — this pipeline runs with zero manual triggers
+
+**The ETL side (the actual "production" automation):**
+A scheduled GitHub Actions workflow (`.github/workflows/scheduled_pipeline.yml`)
+runs daily: extraction → load to Supabase → `dbt run` → `dbt test`. No one
+needs to open a laptop, start a Codespace, or click anything — GitHub's own
+infrastructure runs this on schedule, and it's free and unlimited on a
+public repository.
+
+**The dashboard side (the actual CD):**
+Deployed on Streamlit Community Cloud, connected directly to this GitHub
+repo. Every push to `main` automatically triggers a redeploy — genuine
+continuous deployment, not just continuous integration.
+
+**An honest note on why Airflow isn't the live scheduler:**
+The Dockerized Airflow DAG in this repo is real, working, and was validated
+end-to-end — it's a genuine demonstration of orchestration skill. But
+keeping a persistent Airflow instance running 24/7 isn't achievable for
+free (GitHub Codespaces caps free usage at 60 core-hours/month, which a
+constantly-running scheduler would exhaust in days). Rather than pretend
+otherwise, this project uses GitHub Actions' own scheduling as the actual
+production automation, and keeps the Airflow build as a separate,
+demonstrated artifact. This is a legitimate, commonly-used trade-off for
+pipelines at this scale — not a shortcut hiding a gap.
 
 ---
 
 ## What was actually built
 
 ### 1. Extraction
-- **`extract_abs.py`** — pulls Australian CPI (inflation) data from the ABS
-  Data API. Uses the labelled-CSV response format rather than raw SDMX-JSON,
-  which turned out to be far more reliable to parse. Filtered from an initial
-  197,736-row unfiltered pull down to the correct 14-month headline series
-  after manually inspecting the API's dimension structure.
-- **`extract_cdr_products.py`** — pulls live product listings from 4 Australian
-  banks' public Consumer Data Right (Open Banking) APIs: ANZ, Westpac, CBA,
-  and Suncorp.
+- **`extract_abs.py`** — pulls Australian CPI data from the ABS Data API,
+  using a labelled-CSV response format after finding it far more reliable
+  to parse than raw SDMX-JSON. Filtered from an initial 197,736-row
+  unfiltered pull down to the correct 14-month headline series after
+  manually inspecting the API's dimension structure.
+- **`extract_cdr_products.py`** — pulls live product listings from 4
+  Australian banks' public Consumer Data Right (Open Banking) APIs: ANZ,
+  Westpac, CBA, and Suncorp.
 - **`extract_cdr_product_rates.py`** — pulls the actual interest rate detail
-  for every product (a separate API call per product, ~200 calls per run).
-  Includes **automatic API version negotiation**: each bank's product detail
-  endpoint requires a different, undocumented API version, and each phrases
-  its version-mismatch error differently. Rather than hardcoding four
-  different configurations by hand, the extractor reads each bank's own
-  error response, parses out the version it wants (handling three different
-  real-world phrasings), retries automatically, and caches the working
-  version — so it self-adapts if a bank changes its supported version again
-  in future.
+  for every product. Includes **automatic API version negotiation**: each
+  bank's product detail endpoint requires a different, undocumented API
+  version, and each phrases its version-mismatch error differently. The
+  extractor reads each bank's own error response, parses out the version it
+  wants (handling three different real-world phrasings, including a
+  response-header fallback for banks that don't state it in the error body),
+  retries automatically, and caches the working version per bank.
 
 ### 2. Storage
-Free-tier hosted Postgres via Supabase. Every extraction run **appends** a
-timestamped snapshot rather than overwriting — a deliberate design choice so
-the pipeline builds a genuine history of how rates move over time, which is
-the entire point of the analysis.
+Free-tier hosted Postgres via Supabase, reached through the Session Pooler
+(the direct connection is IPv6-only and doesn't work reliably on most
+networks). Every extraction run **appends** a timestamped snapshot rather
+than overwriting.
 
 ### 3. Transformation (dbt)
-- **Staging models** — light cleaning: renaming, type casting, dropping
-  redundant columns.
-- **Mart models** — the real business logic: deduplicating each append-only
-  raw table down to the latest snapshot per product/rate/month using window
-  functions, then joining rates against product metadata.
-- **16 automated data tests** (`not_null`, `unique`, `accepted_values`) —
-  and genuinely caught a real bug during development: the CPI mart initially
-  lacked the same deduplication logic as the product mart, which a `unique`
-  test surfaced the moment a second pipeline run created real duplicate data
-  to test against.
+Staging and mart models as described in the medallion table above, with
+**16 automated data tests** — which genuinely caught a real bug during
+development: the CPI mart initially lacked the same deduplication logic as
+the product mart, surfaced by a `unique` test failing the moment a second
+pipeline run created real duplicate data to test against.
 
 ### 4. Orchestration
 A fully Dockerized Apache Airflow setup (webserver, scheduler, its own
-metadata database) running a 3-task DAG: extract → transform → test, in
-that order, with dependency enforcement and retry logic. Built and run via
-GitHub Codespaces after a local Windows machine's virtualization support
-proved unstable mid-build — a deliberate infrastructure decision, not a
-shortcut.
+metadata database) running a 3-task DAG: extract → transform → test.
 
 ### 5. CI/CD
-GitHub Actions runs linting (flake8), formatting checks (black), and a unit
-test suite (pytest, with all external API calls mocked) on every push.
+- **CI:** GitHub Actions runs linting (flake8), formatting checks (black),
+  and a unit test suite (pytest, with all external API calls mocked) on
+  every push.
+- **CD:** covered above — scheduled ETL via GitHub Actions, automatic
+  dashboard redeployment via Streamlit Community Cloud.
 
 ### 6. Visualization
-A Streamlit dashboard with five tabs:
-- **Overview** — headline metrics and an auto-generated sentence connecting
-  CPI direction to average lending rate spread.
-- **Key Insights** — for every rate category with enough bank coverage to
-  compare meaningfully, automatically identifies the winning bank, the
-  margin over the runner-up, and an overall "most competitive bank" leaderboard.
-- **Rate Comparison** — filterable charts with consistent per-bank colour
-  coding and auto-generated comparison sentences.
-- **Product Browser** — searchable/filterable table of all tracked products.
-- **CPI Trend** — detailed inflation trend and month-over-month movement.
-
----
-
-## Key insights (example findings from a test run — re-run the pipeline for current numbers)
-
-*Numbers below are illustrative, captured during development, and will differ
-from a live run — that's the entire design point of the project. Replace this
-section with your dashboard's current output before publishing.*
-
-- Credit card cash advance and purchase rates clustered in the **18–21%**
-  range across the three banks that reported them, with roughly a **2.5
-  percentage point spread** between the cheapest and most expensive.
-- Fixed-rate home loan pricing showed real competitive variation: a
-  **~0.6 percentage point gap** between the most and least competitive bank
-  in the same category — a meaningful difference on a mortgage over its
-  lifetime.
-- Not every bank competes in every category — this is a real finding in
-  itself, not a data gap. Suncorp, for example, doesn't publish a
-  market-linked home loan product, while it does compete aggressively in
-  bonus savings rates.
-- Headline CPI moved between roughly 1.9% and 4.6% year-on-year across the
-  tracked window, with average advertised lending rates sitting several
-  percentage points above the current inflation reading throughout — the
-  kind of spread a lending-conditions analyst would actually track.
+A Streamlit dashboard with five tabs — Overview, Key Insights (auto-ranked
+category leaders per bank), Rate Comparison, Product Browser, and CPI
+Trend — using a consistent colour per bank across every chart.
 
 ---
 
 ## Why this is relevant beyond a portfolio exercise
 
-This mirrors a real, existing commercial function:
-- **Comparison sites** (Canstar, Finder, RateCity) exist specifically to
-  answer "which bank has the best rate right now" — this project answers
-  the same question independently, end-to-end.
-- **Bank pricing/strategy teams** benchmark their own rates against
-  competitors using data structured exactly like this.
-- **Fintechs building lending or refinancing products** use signals like
-  "where is the market underpriced right now" to time customer acquisition.
-
-The Consumer Data Right (Open Banking) data source used here is itself a
-meaningful, under-used dataset — genuinely public, genuinely live, and
-rarely appearing in portfolio projects, since most people default to Kaggle
-CSVs instead of real regulatory APIs.
-
----
-
-## Key learnings
-
-**Technical:**
-- Real-world APIs rarely behave like their documentation promises — CDR
-  banks negotiate API versions inconsistently, and building automatic
-  negotiation (rather than hardcoding per-bank config) was a better, more
-  resilient engineering decision than it first appeared necessary.
-- Tools that seem compatible on paper (dbt and Airflow) can have silently
-  conflicting dependency trees — isolating dbt in its own virtual environment
-  inside the same container solved this properly rather than papering over it.
-- Automated tests don't just catch typos — a `unique` test caught a genuine
-  logic gap (missing deduplication) that manual review had missed entirely.
-- Encoding issues are still a real, current problem: a single UTF-16 vs
-  UTF-8 mismatch in a `.gitignore` file (caused by PowerShell's default
-  redirect encoding) silently caused an entire folder to vanish from version
-  control for several sessions before being traced to its root cause.
-
-**Process:**
-- Scoping decisions are part of the engineering, not a failure of it —
-  explicitly excluding a bank with a persistent, undiagnosable API bug (and
-  documenting why) is a legitimate decision, not an incomplete project.
-- Free-tier infrastructure has real, honest limits (Codespaces isn't
-  meant to run 24/7) — being upfront about what a portfolio-scale build
-  does and doesn't demonstrate is more credible than overstating it.
+This mirrors a real, existing commercial function: comparison sites like
+Canstar and Finder exist specifically to answer "which bank has the best
+rate right now"; bank pricing teams benchmark against competitors using
+data structured exactly like this; fintechs use signals like "where is the
+market underpriced" to time customer acquisition. The Consumer Data Right
+data source used here is genuinely public, genuinely live, and rarely
+appears in portfolio projects, since most default to static Kaggle CSVs
+instead of real regulatory APIs.
 
 ---
 
 ## Known limitations
 
-- **AMP is excluded** from bank product/rate extraction — its CDR endpoint
-  returns a persistent, unresolvable version-negotiation error regardless
-  of the version requested, which points to a bug in AMP's own
-  implementation rather than anything fixable from this side.
+- **AMP is excluded** — its CDR endpoint returns a persistent,
+  unresolvable version-negotiation error regardless of the version
+  requested, pointing to a bug in AMP's own implementation.
 - **Individual banks occasionally have transient API failures** (observed
   with Westpac) — the pipeline logs a warning and continues rather than
-  failing the whole run; a bank's absence from one snapshot doesn't mean
-  permanent exclusion.
-- **This is a portfolio-scale build**, not a production system: it runs on
-  free-tier infrastructure, isn't deployed to run continuously, and doesn't
-  handle the volume or reliability guarantees a real commercial deployment
-  would require.
+  failing the whole run.
+- **This is a portfolio-scale build**, not an enterprise production system —
+  it runs on free-tier infrastructure and doesn't carry the volume or
+  reliability guarantees a commercial deployment would require.
 
 ---
 
@@ -232,37 +216,38 @@ CSVs instead of real regulatory APIs.
 ```
 marketpulse/
   src/
-    extract_abs.py                 # ABS CPI extraction
-    extract_cdr_products.py        # CDR product listing extraction
-    extract_cdr_product_rates.py   # CDR rate detail extraction w/ version negotiation
-    load_raw.py                    # orchestrates all extraction -> Supabase
-    utils/db.py                    # database connection helper
+    extract_abs.py
+    extract_cdr_products.py
+    extract_cdr_product_rates.py
+    load_raw.py
+    utils/db.py
   marketpulse_dbt/
-    models/staging/                # cleaning models
-    models/marts/                  # business-logic models (dedup, joins)
+    models/staging/
+    models/marts/
   dags/
-    marketpulse_pipeline.py        # Airflow DAG
+    marketpulse_pipeline.py        # Airflow DAG (demonstrated, not live scheduler)
   streamlit_app/
-    app.py                         # dashboard
-  tests/                           # pytest unit tests (mocked API responses)
-  .github/workflows/ci.yml         # lint + test on every push
-  Dockerfile, docker-compose.yaml  # Airflow container setup
+    app.py                          # live dashboard
+  tests/
+  .github/workflows/
+    ci.yml                          # lint + test on every push
+    scheduled_pipeline.yml          # daily automated ETL — the real production scheduler
+  Dockerfile, docker-compose.yaml
   requirements.txt
-  NOTES.md                         # running decision log
+  NOTES.md
 ```
 
 ## Setup
 
-1. Create a free Supabase project — copy the Session Pooler connection string
-   (not the direct connection; it's IPv4-only and avoids a connectivity issue
-   documented in `NOTES.md`).
+1. Create a free Supabase project — use the Session Pooler connection string.
 2. Copy `.env.example` to `.env` and fill in `DATABASE_URL`.
 3. `pip install -r requirements.txt`
-4. `python src/load_raw.py` — runs full extraction and loads Supabase.
+4. `python src/load_raw.py`
 5. `cd marketpulse_dbt && dbt run && dbt test`
 6. `streamlit run streamlit_app/app.py`
-7. (Optional) `docker compose up airflow-init && docker compose up -d` for
-   full orchestration via Airflow.
+7. For scheduled automation: add `DATABASE_URL`, `SUPABASE_HOST`,
+   `SUPABASE_USER`, `SUPABASE_PASSWORD` as GitHub repo secrets — the
+   `scheduled_pipeline.yml` workflow handles the rest automatically.
 
 ---
 
